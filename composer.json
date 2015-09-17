@@ -1,5 +1,5 @@
 {
-    "name": "vinelab/cdn",
+    "name": "luanli22/cdn",
     "description": "Content Delivery Network (CDN) Package for Laravel",
     "license": "MIT",
     "keywords": [
@@ -17,6 +17,10 @@
         {
             "name": "Mahmoud Zalt",
             "email": "mahmoud@vinelab.com"
+        },
+        {
+            "name": "Luan Li",
+            "email": "luanli22@me.com"          
         }
     ],
     "require": {
