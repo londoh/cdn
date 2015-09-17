@@ -24,7 +24,7 @@
         "illuminate/support": "~5.0",
         "illuminate/config": "~5.0",
         "symfony/finder": "2.7.*",
-        "symfony/console": "2.7.*",
+        "symfony/console": "2.6.*",
         "aws/aws-sdk-php": "~3.0"
     },
     "require-dev": {
@@ -40,5 +40,5 @@
             "Vinelab\\Cdn\\": "src/"
         }
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "stable"
 }
