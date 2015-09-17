@@ -174,7 +174,7 @@ class AwsS3Provider extends Provider implements ProviderInterface
      *
      * @return bool
      */
-    public function upload($assets)
+    public function upload($assets, $compress=true)
     {
         // connect before uploading
         $connected = $this->connect();
@@ -188,26 +188,55 @@ class AwsS3Provider extends Provider implements ProviderInterface
 
         // upload each asset file to the CDN
         foreach ($assets as $file) {
-            try {
-                $command = $this->s3_client->getCommand('putObject', [
 
-                    // the bucket name
+            try {
+
+                $this->batch->add($this->s3_client->getCommand('PutObject', [
+
                     'Bucket' => $this->getBucket(),
+                    // the bucket name
+                    'Key'    => str_replace('\\', '/', $file->getPathName()),
                     // the path of the file on the server (CDN)
-                    'Key' => str_replace('\\', '/', $file->getPathName()),
+                    'Body'   => fopen($file->getRealPath(), 'r'),
                     // the path of the path locally
-                    'Body' => fopen($file->getRealPath(), 'r'),
+                    'ACL'    => $this->acl,
                     // the permission of the file
 
-                    'ACL' => $this->acl,
                     'CacheControl' => $this->default['providers']['aws']['s3']['cache-control'],
                     'MetaData' => $this->default['providers']['aws']['s3']['metadata'],
-                    'Expires' => $this->default['providers']['aws']['s3']['expires'],
-                ]);
-//                var_dump(get_class($command));exit();
-                $this->s3_client->execute($command);
-            } catch (S3Exception $e) {
-                $this->console->writeln('<fg=red>'.$e->getMessage().'</fg=red>');
+                    "Expires" => $this->default['providers']['aws']['s3']['expires']
+
+                ]));
+                
+                // upload gzip file version to js/css scripts
+
+                $filename = preg_replace('/\.(css|js)/', '.gzip', $file->getPathName());
+                    file_put_contents($filename, gzencode(file_get_contents($file->getRealPath()), 9));   
+
+                $this->batch->add($this->s3_client->getCommand('PutObject', [
+
+                if ($compress && (ends_with($file->getPathName(), '.css') || ends_with($file->getPathName(), '.js'))) {
+                       'Bucket'            => $this->getBucket(),
+                        // the bucket name
+                        'Key'               => str_replace('\\', '/', $filename),
+                        // the path of the file on the server (CDN)
+                        'Body'              => fopen($filename, 'r'),
+                        // the path of the path locally
+                        'ACL'               => $this->acl,
+                        // extra headers for compressed files
+                        'ContentType'       => 'binary/octet-stream',
+                        'Content-Encoding'  => 'gzip',
+                        // the permission of the file
+                        'CacheControl'      => $this->default['providers']['aws']['s3']['cache-control'],
+                        'MetaData'          => $this->default['providers']['aws']['s3']['metadata'],
+                        "Expires"           => $this->default['providers']['aws']['s3']['expires']
+
+                    ]));                    
+                }
+
+
+            } catch(S3Exception $e) {
+                $this->console->writeln("<fg=red>Error while uploading: ($file->getRealpath())</fg=red>");
 
                 return false;
             }
