@@ -209,13 +209,12 @@ class AwsS3Provider extends Provider implements ProviderInterface
                 ]));
                 
                 // upload gzip file version to js/css scripts
+                if ($compress && (ends_with($file->getPathName(), '.css') || ends_with($file->getPathName(), '.js'))) {                    
 
-                $filename = preg_replace('/\.(css|js)/', '.gzip', $file->getPathName());
-                    file_put_contents($filename, gzencode(file_get_contents($file->getRealPath()), 9));   
+                    $filename = preg_replace('/\.(css|js)/', '.gzip', $file->getPathName());
+                    file_put_contents($filename, gzencode(file_get_contents($file->getRealPath()), 9));                       
 
-                $this->batch->add($this->s3_client->getCommand('PutObject', [
-
-                if ($compress && (ends_with($file->getPathName(), '.css') || ends_with($file->getPathName(), '.js'))) {
+                    $this->batch->add($this->s3_client->getCommand('PutObject', [
                        'Bucket'            => $this->getBucket(),
                         // the bucket name
                         'Key'               => str_replace('\\', '/', $filename),
