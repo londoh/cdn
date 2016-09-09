@@ -3,6 +3,7 @@
 namespace Vinelab\Cdn\tests;
 
 // requiring this file to reference assertions as global functions. (to skip the $this->)
+// Im not sure about this
 require_once 'vendor/phpunit/phpunit/src/Framework/Assert/Functions.php';
 
 use PHPUnit_Framework_TestCase as PHPUnit;
