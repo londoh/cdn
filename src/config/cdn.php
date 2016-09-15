@@ -4,7 +4,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Bypass loading assets from the CDN
+    | Bypass loading assets from the CDN testing repo udates
     |--------------------------------------------------------------------------
     |
     | This option determines whether to load the assets from localhost or from
